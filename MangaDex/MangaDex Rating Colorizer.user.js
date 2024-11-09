@@ -87,7 +87,6 @@ function chapPage(start)
             ratObserver.disconnect();
         }
         findAndColorRating();
-        checkChapters();
     }
     else
     {
@@ -99,18 +98,6 @@ function chapPage(start)
     }
 }
 
-async function checkChapters()
-{
-    const chaps = await waitForList("[role=alert], .chapter");
-    if (!chaps[0].classList.contains("chapter"))
-    {
-        if (window.confirm("There are no chapters ! Close tab ?"))
-        {
-            window.close();
-        }
-    }
-}
-
 function manageMangaDexFeatures()
 {
     chapPage(window.location.href.includes("title"));
@@ -118,6 +105,7 @@ function manageMangaDexFeatures()
 
 function main()
 {
+    manageMangaDexFeatures();
     const originalPushState = history.pushState;
     history.pushState = function(...args) {
         originalPushState.apply(this, args);

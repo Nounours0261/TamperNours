@@ -141,7 +141,7 @@ function openAuto(k)
     if (k.key == "Enter")
     {
         let buttons = document.getElementsByClassName("additional-content__item additional-content__item--item-info");
-        if (!buttons)
+        if (buttons.length == 0)
         {
             return;
         }
@@ -158,25 +158,41 @@ function runScript() {
     }
 }
 
+function preloadImage(url)
+{
+    var img = new Image();
+    img.src = url;
+}
+
+const kanjiBanner = "https://i.imgur.com/Iwti2l4.png";
+const vocabBanner = "https://i.imgur.com/DhpVXQs.png";
+const radicalBanner = "https://i.imgur.com/psHKzBs.png";
+
 function changeBG()
 {
+    preloadImage(kanjiBanner);
+    preloadImage(vocabBanner);
+    preloadImage(radicalBanner);
     const style = document.createElement('style');
     style.type = 'text/css';
     style.innerHTML = `
     .character-header--vocabulary {
-        background-image: url('to-replace') !important;
+        background-image: url(${vocabBanner}) !important;
         background-size: cover; /* Adjusts the size of the image */
         background-position: center; /* Centers the image */
+        text-shadow: 2px 2px 0 #602c85 !important;
     }
     .character-header--kanji {
-        background-image: url('to-replace') !important;
+        background-image: url(${kanjiBanner}) !important;
         background-size: cover; /* Adjusts the size of the image */
         background-position: center; /* Centers the image */
+        text-shadow: 2px 2px 0 #a32032 !important;
     }
     .character-header--radical {
-        background-image: url('to-replace') !important;
+        background-image: url(${radicalBanner}) !important;
         background-size: cover; /* Adjusts the size of the image */
         background-position: center; /* Centers the image */
+        text-shadow: 2px 2px 0 #bc3c6f !important;
     }
 `;
     document.head.appendChild(style);
