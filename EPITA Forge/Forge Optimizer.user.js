@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Forge Optimizer
 // @namespace    Nounours0261
-// @version      0
+// @version      1
 // @description  Make Forge navigation easier
 // @author       Nours & ChatGPT
 // @match        https://intra.forge.epita.fr/*
@@ -365,7 +365,7 @@ function handleExercisePage()
         }
     }
 
-    if (autoReload && tagStatus == "PROCESSING")
+    if (autoReload && tagStatus(tagres) == "PROCESSING")
     {
         setTimeout(function(){
             location.reload()
