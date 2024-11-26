@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WaniKaNours
 // @namespace    Nounours0261
-// @version      1
+// @version      1.1
 // @description  Useful features on WaniKani
 // @author       ChatGPT & Nours
 // @match        https://www.wanikani.com/*
@@ -126,7 +126,7 @@ async function kataLessons(start)
         {
             lesObserver = new MutationObserver((mutations) => { mutations.forEach(handleLesMutation); });
         }
-        if (observingLes)
+        if (!observingLes)
         {
             observingLes = true;
             lesObserver.observe(document.getElementsByTagName("body")[0], {childList: true});
