@@ -10,16 +10,21 @@
 // @grant        window.close
 // ==/UserScript==
 
-function waitForList(selector = "*", parent = document) {
+function waitForList(selector, times) {
+    let step = times ? 1 : 0;
+    times = times ? times : 10;
     return new Promise((resolve) => {
-        const interval = setInterval(() => {
-            const list = parent.querySelectorAll(selector);
-            console.log("tried", selector);
-            if (list.length != 0) {
+        let interval;
+        const testFunction = () => {
+            const list = document.querySelectorAll(selector);
+            if (list.length !== 0 || times <= 0) {
                 clearInterval(interval);
                 resolve(list);
             }
-        }, 100);
+            times -= step;
+        };
+        testFunction();
+        interval = setInterval(testFunction, 100);
     });
 }
 
@@ -52,8 +57,8 @@ function handleRatMutation(mutation, ratButton)
 async function findAndColorRating()
 {
     console.log("findcolor");
-    const libButton = (await waitForList("[data-v-8d292eb9][data-v-c2249ac3]"))[0];
-    const ratButton = (await waitForList("[data-v-fde6a51a] > [data-v-8d292eb9]"))[0];
+    const libButton = (await waitForList("[data-v-fa81b2e8][data-v-c2249ac3]"))[0];
+    const ratButton = (await waitForList("[data-v-fde6a51a] > [data-v-fa81b2e8]"))[0];
     const spanF = (await waitForList("span", ratButton))[0];
 
     libButton.classList.remove('primary');

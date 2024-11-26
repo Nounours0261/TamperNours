@@ -54,15 +54,21 @@ function handleRevMutation(mutation)
     }
 }
 
-function waitForElement(id) {
+function waitForList(selector, times) {
+    let step = times ? 1 : 0;
+    times = times ? times : 10;
     return new Promise((resolve) => {
-        const interval = setInterval(() => {
-            const element = document.getElementById(id);
-            if (element) {
+        let interval;
+        const testFunction = () => {
+            const list = document.querySelectorAll(selector);
+            if (list.length != 0 || times <= 0) {
                 clearInterval(interval);
-                resolve(element);
+                resolve(list);
             }
-        }, 100);
+            times -= step;
+        };
+        testFunction();
+        interval = setInterval(testFunction, 100);
     });
 }
 
@@ -77,7 +83,7 @@ async function kataReviews(start)
         if (!observingRev)
         {
             observingRev = true;
-            let subInfo = await waitForElement("subject-info");
+            let subInfo = (await waitForList("#subject-info"))[0];
             revObserver.observe(subInfo, {childList: true});
         }
     }
@@ -136,80 +142,84 @@ async function kataLessons(start)
     }
 }
 
-function openAuto(k)
+function runScript()
 {
-    if (k.key == "Enter")
-    {
-        let buttons = document.getElementsByClassName("additional-content__item additional-content__item--item-info");
-        if (buttons.length == 0)
-        {
-            return;
-        }
-        buttons[0].click();
-    }
-}
-
-function runScript() {
     const url = window.location.href;
-    if (true) {
-        kataReviews(url.includes("review"));
-        kataLessons(url.includes("subject-lessons") && !url.includes("quiz") && !url.includes("picker"));
-        kataReviews(url.includes("subject-lessons") && url.includes("quiz"));
+    kataReviews(url.includes("review"));
+    kataLessons(url.includes("subject-lessons") && !url.includes("quiz") && !url.includes("picker"));
+    kataReviews(url.includes("subject-lessons") && url.includes("quiz"));
+}
+
+async function rotateInfo(info)
+{
+    const c = info.children[0];
+    c.insertBefore(c.children[1], c.children[0]);
+}
+
+async function handleBackspace()
+{
+    const info = (await waitForList(`.subject-info[data-loaded=true]`))[0];
+    if (!Array.from(await waitForList(`.subject-section`)).every((e) => { return e.hasAttribute("expanded") }))
+    {
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "e", bubbles: true, }));
+    }
+    rotateInfo(info);
+}
+
+async function handleEnter()
+{
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "f", bubbles: true, }));
+    const info = (await waitForList(`.subject-info[data-loaded=true]`))[0];
+    if (!Array.from(await waitForList(`.subject-section`)).every((e) => { return e.hasAttribute("expanded") }))
+    {
+        const f = info.children[0].children[0];
+        const type = f.classList.contains("subject-section--meaning")
+        ? "vocab"
+        : (f.classList.contains("subject-section--components") ? "kanji" : "radical");
+        if (type == "kanji")
+        {
+            const meaningDiv = document.createElement("div");
+            meaningDiv.prepend(info.children[0].children[0], info.children[0].children[1]);
+            info.children[0].prepend(meaningDiv);
+        }
+        info.setAttribute("noursType", type);
+    }
+    if (info.children[0].children[1].hasAttribute("expanded"))
+    {
+        rotateInfo(info);
     }
 }
 
-function preloadImage(url)
+async function handleKeys(e)
 {
-    var img = new Image();
-    img.src = url;
+    if (e.key == "Backspace")
+    {
+        const response = document.getElementById("user-response");
+        if (response && response.getAttribute("enabled") == "false")
+        {
+            handleBackspace();
+        }
+    }
+    if (e.key == "Enter")
+    {
+        const response = document.getElementsByClassName("additional-content__item--item-info")[0];
+        if (response && !response.classList.contains("additional-content__item--open"))
+        {
+            handleEnter();
+        }
+    }
 }
 
-const kanjiBanner = "https://i.imgur.com/Iwti2l4.png";
-const vocabBanner = "https://i.imgur.com/DhpVXQs.png";
-const radicalBanner = "https://i.imgur.com/psHKzBs.png";
-
-function changeBG()
+async function main()
 {
-    preloadImage(kanjiBanner);
-    preloadImage(vocabBanner);
-    preloadImage(radicalBanner);
-    const style = document.createElement('style');
-    style.type = 'text/css';
-    style.innerHTML = `
-    .character-header--vocabulary {
-        background-image: url(${vocabBanner}) !important;
-        background-size: cover; /* Adjusts the size of the image */
-        background-position: center; /* Centers the image */
-        text-shadow: 2px 2px 0 #602c85 !important;
-    }
-    .character-header--kanji {
-        background-image: url(${kanjiBanner}) !important;
-        background-size: cover; /* Adjusts the size of the image */
-        background-position: center; /* Centers the image */
-        text-shadow: 2px 2px 0 #a32032 !important;
-    }
-    .character-header--radical {
-        background-image: url(${radicalBanner}) !important;
-        background-size: cover; /* Adjusts the size of the image */
-        background-position: center; /* Centers the image */
-        text-shadow: 2px 2px 0 #bc3c6f !important;
-    }
-`;
-    document.head.appendChild(style);
-}
-
-function main()
-{
-    'use strict';
+    runScript();
     const originalPushState = history.pushState;
     history.pushState = function(...args) {
         originalPushState.apply(this, args);
         runScript();
     };
     window.addEventListener('popstate', runScript);
-    window.addEventListener('keydown', openAuto);
-    runScript();
-    changeBG();
+    document.addEventListener('keydown', handleKeys);
 }
 
 main();

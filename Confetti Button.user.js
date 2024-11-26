@@ -7,7 +7,6 @@
 // @match        *://*/*
 // @icon         https://thumbs.dreamstime.com/b/feux-d-artifice-14498127.jpg
 // @run-at       document-idle
-// @grant        none
 // @require      https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js
 // ==/UserScript==
 
@@ -71,11 +70,6 @@ function randint(min, max) {
     const maxFloored = Math.floor(max);
     return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
 }
-
-
-
-
-
 
 function fullConfetti() {
     // Define all magic values as variables
@@ -272,4 +266,16 @@ function launch() {
         rotateConfetti(0.5, 0.51, 2, 0);
 }
 
-makeButton().addEventListener('click', launch);
+async function main()
+{
+    let b = makeButton();
+    b.addEventListener('click', launch);
+    b.style.display = 'none';
+    document.addEventListener('keydown', (e) => {
+        if (e.key == 'c' && e.altKey)
+        {
+            b.style.display = b.style.display == 'block' ? 'none' : 'block';
+        }
+    });
+}
+main();
