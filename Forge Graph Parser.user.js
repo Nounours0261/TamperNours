@@ -163,60 +163,33 @@ function createButtons(nodes, relationships)
         {
             if (isValidated(node.id))
             {
-                createButton(vlist, node.id, "#e63d37", "#fffffff");
+                createButton(vlist, node.id, "#06d6a0", "#000");
             }
             else
             {
                 const nbkids = getChildren(relationships, node.id);
                 const nbgkids = getDescendants(relationships, node.id, nbkids);
-                createButton(alist, node.id, "#2fded8", "#000000", nbkids, nbgkids);
+                createButton(alist, node.id, "#ffd166", "#000000", nbkids, nbgkids);
             }
         }
         else
         {
-            createButton(nlist, node.id, "#854ede", "#ffffff");
+            createButton(nlist, node.id, "#ef476f", "#000");
         }
     });
     sortName(vlist);
     sortKids(alist);
     sortName(nlist);
 
-    let nbdivs = alist.length % (alist.length - 1) + nlist.length % (nlist.length - 1) + vlist.length % (vlist.length - 1);
+    let nbdivs = 0;
+    if (alist.length != 0) { nbdivs += 1; }
+    if (nlist.length != 0) { nbdivs += 1; }
+    if (vlist.length != 0) { nbdivs += 1; }
     let gtc = 6 / nbdivs;
 
     const mainDiv = document.createElement('div');
     mainDiv.style.display = 'grid';
     mainDiv.style.gridTemplateColumns = `repeat(${nbdivs}, 1fr)`;
-
-    if (nlist.length)
-    {
-        const nBig = document.createElement('div');
-        const ntitleDiv = document.createElement('div');
-        const ntitle = document.createElement('button');
-        const ncontainer = document.createElement('div');
-        ntitleDiv.style.gap = '10px';
-        ntitleDiv.style.padding = '20px 10px 20px';
-        ntitleDiv.style.display = 'grid';
-        ntitle.onclick = function() {ncontainer.style.display = (ncontainer.style.display == "grid" ? "none" : "grid");};
-        ntitle.style.fontSize = '14px';
-        ntitle.style.backgroundColor = "#854ede";
-        ntitle.style.cursor = 'pointer';
-        ncontainer.style.display = 'grid';
-        ncontainer.style.gridTemplateColumns = `repeat(${gtc}, 1fr)`;
-        ncontainer.style.gap = '10px';
-        ncontainer.style.padding = '0px 10px 20px';
-        ntitle.textContent = "Unavailable exercises (".concat(nlist.length, ")");
-
-        for (let i = 0; i < nlist.length; i++)
-        {
-            ncontainer.appendChild(nlist[i]);
-        }
-
-        ntitleDiv.appendChild(ntitle);
-        nBig.appendChild(ntitleDiv);
-        nBig.appendChild(ncontainer);
-        mainDiv.appendChild(nBig);
-    }
 
     if (alist.length != 0)
     {
@@ -229,7 +202,7 @@ function createButtons(nodes, relationships)
         atitleDiv.style.display = 'grid';
         atitle.onclick = function() {acontainer.style.display = (acontainer.style.display == "grid" ? "none" : "grid");};
         atitle.style.fontSize = '14px';
-        atitle.style.backgroundColor = "#2fded8";
+        atitle.style.backgroundColor = "#ffd166";
         atitle.style.color = "#000000";
         atitle.style.cursor = 'pointer';
         acontainer.style.display = 'grid';
@@ -249,6 +222,37 @@ function createButtons(nodes, relationships)
         mainDiv.appendChild(aBig);
     }
 
+    if (nlist.length)
+    {
+        const nBig = document.createElement('div');
+        const ntitleDiv = document.createElement('div');
+        const ntitle = document.createElement('button');
+        const ncontainer = document.createElement('div');
+        ntitleDiv.style.gap = '10px';
+        ntitleDiv.style.padding = '20px 10px 20px';
+        ntitleDiv.style.display = 'grid';
+        ntitle.onclick = function() {ncontainer.style.display = (ncontainer.style.display == "grid" ? "none" : "grid");};
+        ntitle.style.fontSize = '14px';
+        ntitle.style.backgroundColor = "#ef476f";
+        ntitle.style.color = "#000";
+        ntitle.style.cursor = 'pointer';
+        ncontainer.style.display = 'grid';
+        ncontainer.style.gridTemplateColumns = `repeat(${gtc}, 1fr)`;
+        ncontainer.style.gap = '10px';
+        ncontainer.style.padding = '0px 10px 20px';
+        ntitle.textContent = "Unavailable exercises (".concat(nlist.length, ")");
+
+        for (let i = 0; i < nlist.length; i++)
+        {
+            ncontainer.appendChild(nlist[i]);
+        }
+
+        ntitleDiv.appendChild(ntitle);
+        nBig.appendChild(ntitleDiv);
+        nBig.appendChild(ncontainer);
+        mainDiv.appendChild(nBig);
+    }
+
     if (vlist.length != 0)
     {
         const vBig = document.createElement('div');
@@ -260,7 +264,8 @@ function createButtons(nodes, relationships)
         vtitleDiv.style.display = 'grid';
         vtitle.onclick = function() {vcontainer.style.display = (vcontainer.style.display == "grid" ? "none" : "grid");};
         vtitle.style.fontSize = '14px';
-        vtitle.style.backgroundColor = "#e63d37";
+        vtitle.style.backgroundColor = "#06d6a0";
+        vtitle.style.color = "#000";
         vtitle.style.cursor = 'pointer';
         vcontainer.style.display = 'none';
         vcontainer.style.gridTemplateColumns = `repeat(${gtc}, 1fr)`;
@@ -293,10 +298,10 @@ function createButton(list, id, color, textColor, nbkids = -1, nbgkids = -1)
     const button = document.createElement('button');
     if (nbkids != -1)
     {
-        str = str.concat("\n👩‍👧", nbkids);
+        str = str.concat("\n> ", nbkids);
         if (nbgkids > 0)
         {
-            str = str.concat("    👩‍👩‍👧‍👧", nbgkids);
+            str = str.concat("    >> ", nbgkids);
         }
     }
     button.style.whiteSpace = "pre-wrap";
@@ -318,7 +323,7 @@ function handleGraph(graph)
 {
     const rootElement = graph.getElementsByClassName("root")[0];
     const nodeList = rootElement.querySelectorAll(".node");
-    if (nodeList.length < 10)
+    if (nodeList.length < 6)
     {
         return;
     }
