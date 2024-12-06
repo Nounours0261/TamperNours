@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Forge Optimizer
 // @namespace    Nounours0261
-// @version      1
+// @version      1.1
 // @description  Make Forge navigation easier
 // @author       Nours & ChatGPT
 // @match        https://intra.forge.epita.fr/*

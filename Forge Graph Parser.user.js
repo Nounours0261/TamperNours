@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Forge Graph Parser
 // @namespace    Nounours0261
-// @version      1
+// @version      1.1
 // @description  Turn the ugly graphs into beautiful lists
 // @author       Nours & ChatGPT
 // @match        https://intra.forge.epita.fr/*
