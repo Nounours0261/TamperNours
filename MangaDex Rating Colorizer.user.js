@@ -1,66 +1,46 @@
 // ==UserScript==
 // @name         MangaDex Rating Colorizer
 // @namespace    Nounours0261
-// @version      1
+// @version      1.1
 // @description  Useful features on MangaDex
 // @author       ChatGPT & Nours
 // @match        https://mangadex.org/*
-// @icon         https://avatars.githubusercontent.com/u/100574686?s=280&v=4
-// @run-at       document-start
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=mangadex.org
+// @run-at       document-idle
 // @grant        window.close
+// @require      https://github.com/Nounours0261/TamperNours/raw/refs/heads/main/waitForList.js
 // ==/UserScript==
 
-function waitForList(selector, times) {
-    let step = times ? 1 : 0;
-    times = times ? times : 10;
-    return new Promise((resolve) => {
-        let interval;
-        const testFunction = () => {
-            const list = document.querySelectorAll(selector);
-            if (list.length !== 0 || times <= 0) {
-                clearInterval(interval);
-                resolve(list);
-            }
-            times -= step;
-        };
-        testFunction();
-        interval = setInterval(testFunction, 100);
-    });
-}
-
-function getColorForRating(rating) {
+function styleRatButton(button, rating) {
     const shades = [
-        '#f72c1e',
-        '#f72c1e',
-        '#f7541e',
-        '#f77c1e',
-        '#f7bd1e',
-        '#f7ec1e',
-        '#cce01b',
-        '#91e01b',
-        '#2fe01b',
-        '#17eb50'
+        '#f73a24',
+        '#f73a24',
+        '#f73a24',
+        '#f78b2c',
+        '#f78b2c',
+        '#97e724',
+        '#97e724',
+        '#29e838',
+        '#29e838',
+        'linear-gradient(90deg, #FFD700, #FFC700, #FFB700)'
     ];
-    return shades[rating - 1] || '#e0f7fa';
+    button.style.background = shades[rating - 1];
+    button.style.boxShadow = (rating == 10) ? "0 4px 6px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 215, 0, 0.5)" : "0 0px 0px";
 }
 
 function handleRatMutation(mutation, ratButton)
 {
     if (mutation.addedNodes.length != 0 && mutation.addedNodes[0].tagName == "SPAN")
     {
-        const rating = parseInt(mutation.addedNodes[0].textContent.trim(), 10);
-        ratButton.style.backgroundColor = getColorForRating(rating);
-        ratButton.classList.remove('primary');
+        styleRatButton(ratButton, parseInt(mutation.addedNodes[0].textContent.trim(), 10));
     }
 }
 
 async function findAndColorRating()
 {
-    console.log("findcolor");
     const libButton = (await waitForList("[data-v-fa81b2e8][data-v-c2249ac3]"))[0];
     const ratButton = (await waitForList("[data-v-fde6a51a] > [data-v-fa81b2e8]"))[0];
-    const spanF = (await waitForList("span", ratButton))[0];
-
+    const spanF = (await waitForList("span", null, ratButton))[0];
     libButton.classList.remove('primary');
     libButton.classList.add('accent');
     ratButton.classList.remove('primary');
@@ -68,7 +48,7 @@ async function findAndColorRating()
     if (spanF.textContent)
     {
         const rating = parseInt(spanF.textContent.trim(), 10);
-        ratButton.style.backgroundColor = getColorForRating(rating);
+        styleRatButton(ratButton, rating);
     }
 
     ratObserver = new MutationObserver(
@@ -76,8 +56,16 @@ async function findAndColorRating()
             (m) => { handleRatMutation(m, ratButton) }
         ); }
     );
-
     ratObserver.observe(ratButton, {childList: true});
+}
+
+async function alertChapters()
+{
+    let list = await waitForList(".text-center.break-word.overflow-auto, [data-v-e82d079a]");
+    if (list[0].classList.contains("text-center"))
+    {
+        window.alert("This manga does not have any chapters available on MangaDex.");
+    }
 }
 
 let ratObserver;
@@ -92,6 +80,7 @@ function chapPage(start)
             ratObserver.disconnect();
         }
         findAndColorRating();
+        alertChapters();
     }
     else
     {
@@ -105,7 +94,7 @@ function chapPage(start)
 
 function manageMangaDexFeatures()
 {
-    chapPage(window.location.href.includes("title"));
+    chapPage(window.location.href.includes("title/"));
 }
 
 function main()
@@ -115,8 +104,9 @@ function main()
     history.pushState = function(...args) {
         originalPushState.apply(this, args);
         manageMangaDexFeatures();
+        console.log("amogus");
     };
-    window.addEventListener('popstate', manageMangaDexFeatures());
+    window.addEventListener('popstate', manageMangaDexFeatures);
 }
 
-main();
+setTimeout(main, 100);
