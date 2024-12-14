@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MangaDex Rating Colorizer
 // @namespace    Nounours0261
-// @version      1.1
+// @version      1.2
 // @description  Useful features on MangaDex
 // @author       ChatGPT & Nours
 // @match        https://mangadex.org/*
@@ -24,6 +24,7 @@ function styleRatButton(button, rating) {
         '#29e838',
         'linear-gradient(90deg, #FFD700, #FFC700, #FFB700)'
     ];
+    button.classList.remove('primary');
     button.style.background = shades[rating - 1];
     button.style.boxShadow = (rating == 10) ? "0 4px 6px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 215, 0, 0.5)" : "0 0px 0px";
 }
@@ -104,7 +105,6 @@ function main()
     history.pushState = function(...args) {
         originalPushState.apply(this, args);
         manageMangaDexFeatures();
-        console.log("amogus");
     };
     window.addEventListener('popstate', manageMangaDexFeatures);
 }
