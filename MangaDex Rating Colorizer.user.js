@@ -1,13 +1,12 @@
 // ==UserScript==
 // @name         MangaDex Rating Colorizer
 // @namespace    Nounours0261
-// @version      1.2
+// @version      1.3
 // @description  Useful features on MangaDex
 // @author       ChatGPT & Nours
 // @match        https://mangadex.org/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=mangadex.org
 // @run-at       document-idle
-// @grant        window.close
 // @require      https://github.com/Nounours0261/TamperNours/raw/refs/heads/main/waitForList.js
 // ==/UserScript==
 
@@ -100,13 +99,13 @@ function manageMangaDexFeatures()
 
 function main()
 {
-    manageMangaDexFeatures();
+    setTimeout(manageMangaDexFeatures, 100);
     const originalPushState = history.pushState;
     history.pushState = function(...args) {
         originalPushState.apply(this, args);
-        manageMangaDexFeatures();
+        setTimeout(manageMangaDexFeatures, 100);
     };
-    window.addEventListener('popstate', manageMangaDexFeatures);
+    window.addEventListener('popstate', () => {setTimeout(manageMangaDexFeatures, 100);});
 }
 
-setTimeout(main, 100);
+main();
