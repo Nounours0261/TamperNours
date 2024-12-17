@@ -36,9 +36,25 @@ async function swapDisplay(Kana)
     await GM.setValue("lastAction", new Date().toISOString());
 }
 
+function loadable(url)
+{
+    return new Promise(
+        (resolve) =>
+        {
+            const img = new Image();
+            img.onload = () => { resolve(true); };
+            img.onerror = () => { resolve(false); };
+            img.src = url;
+        });
+}
 
 async function addKana()
 {
+    let curSource = sources[randint(0, sources.length)];
+    if (!await loadable(curSource))
+    {
+        return;
+    }
     let display = await GM.getValue("display");
     let lastAction = await GM.getValue("lastAction");
     if (display == "none" && hasPassed(lastAction, 1000 * 60 * 60 * 4))
@@ -48,7 +64,7 @@ async function addKana()
     }
 
     const Kana = document.createElement('img');
-    Kana.src = sources[randint(0, sources.length)];
+    Kana.src = curSource;
     Kana.style.cssText = `position: fixed; bottom: 10px; right: 20px; zIndex: 999999;
     width: 200px; height: auto; opacity: 0.5; pointerEvents: none; display: ${display};`;
     document.body.appendChild(Kana);

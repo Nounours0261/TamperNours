@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AnimePahe Background Changer
 // @namespace    Nounours0261
-// @version      1
+// @version      1.1
 // @description  Change the background on AnimePahe anime pages
 // @author       Nours
 // @match        https://animepahe.ru/anime/*
@@ -29,14 +29,9 @@ function getBGElement()
         setTimeout(getBGElement, 10);
         return;
     }
-    //coverList[0].style.transition = 'none';
-//coverList[0].style.opacity = '1';
     coverList[0].style.backgroundImage = bg.replace(bgImageUrl, arima1);
     console.log(coverList[0].style.backgroundImage.replace(/^url\(["']?/, '').replace(/["']?\)$/, ''));
     console.log("finished");
 }
 
-(function() {
-    'use strict';
-    getBGElement();
-})();
+getBGElement();
