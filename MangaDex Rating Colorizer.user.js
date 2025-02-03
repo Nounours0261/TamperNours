@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MangaDex Rating Colorizer
 // @namespace    Nounours0261
-// @version      1.3
+// @version      1.4
 // @description  Useful features on MangaDex
 // @author       ChatGPT & Nours
 // @match        https://mangadex.org/*
@@ -59,15 +59,6 @@ async function findAndColorRating()
     ratObserver.observe(ratButton, {childList: true});
 }
 
-async function alertChapters()
-{
-    let list = await waitForList(".text-center.break-word.overflow-auto, [data-v-e82d079a]");
-    if (list[0].classList.contains("text-center"))
-    {
-        window.alert("This manga does not have any chapters available on MangaDex.");
-    }
-}
-
 let ratObserver;
 let ratObserving = false;
 
@@ -80,7 +71,6 @@ function chapPage(start)
             ratObserver.disconnect();
         }
         findAndColorRating();
-        alertChapters();
     }
     else
     {
@@ -92,20 +82,20 @@ function chapPage(start)
     }
 }
 
-function manageMangaDexFeatures()
+function newPage()
 {
     chapPage(window.location.href.includes("title/"));
 }
 
 function main()
 {
-    setTimeout(manageMangaDexFeatures, 100);
+    setTimeout(newPage, 100);
     const originalPushState = history.pushState;
     history.pushState = function(...args) {
         originalPushState.apply(this, args);
-        setTimeout(manageMangaDexFeatures, 100);
+        setTimeout(newPage, 100);
     };
-    window.addEventListener('popstate', () => {setTimeout(manageMangaDexFeatures, 100);});
+    window.addEventListener('popstate', () => {setTimeout(newPage, 100);});
 }
 
 main();

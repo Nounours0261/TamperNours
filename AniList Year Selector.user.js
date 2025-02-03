@@ -1,32 +1,15 @@
 // ==UserScript==
 // @name         AniList Year Selector
 // @namespace    Nounours0261
-// @version      1
-// @description  Adds an input for year selection on AniList
+// @version      1.2
+// @description  Add a text input for year selection on AniList
 // @author       ChatGPT & Nours
 // @match        https://anilist.co/*
-// @icon         https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/AniList_logo.svg/512px-AniList_logo.svg.png
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=anilist.co
 // @run-at       document-idle
+// @require      https://github.com/Nounours0261/TamperNours/raw/refs/heads/main/waitForList.js
 // @grant        none
 // ==/UserScript==
-
-function waitForList(selector, times) {
-    let step = times ? 1 : 0;
-    times = times ? times : 10;
-    return new Promise((resolve) => {
-        let interval;
-        const testFunction = () => {
-            const list = document.querySelectorAll(selector);
-            if (list.length != 0 || times <= 0) {
-                clearInterval(interval);
-                resolve(list);
-            }
-            times -= step;
-        };
-        testFunction();
-        interval = setInterval(testFunction, 100);
-    });
-}
 
 function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
@@ -34,18 +17,17 @@ function clamp(value, min, max) {
 
 async function replaceSlider()
 {
-    if (document.getElementById("noursyear"))
+    const slider = (await waitForList("[role='slider']"))[0];
+    if (slider.hasAttribute("noursyear"))
     {
-        console.log("already replaced slider");
         return;
     }
-    const slider = await waitForElement("[role='slider']");
-    const minYear = 1950;
-    const maxYear = parseInt(slider.getAttribute("aria-valuemax"));
+    slider.setAttribute("noursyear", "");
+    slider.style.display = "none";
+    slider.parentElement.style.display = "none";
 
-    const container = document.createElement('div');
-    container.id = "noursyear";
-    container.style.cssText = "margin-top: 10px; display: grid; grid-template-columns: 1fr 32px; background-color: #151f2e; border-radius: 3px;";
+    const minYear = parseInt(slider.getAttribute("aria-valuemin"));
+    const maxYear = parseInt(slider.getAttribute("aria-valuemax"));
 
     const input = document.createElement('input');
     input.type = 'number';
@@ -80,11 +62,19 @@ async function replaceSlider()
     `;
     document.head.appendChild(style);
 
+    const container = document.createElement('div');
+    container.style.cssText = "margin-top: 10px; display: grid; grid-template-columns: 1fr 32px; background-color: #151f2e; border-radius: 3px;";
     container.append(input, button);
     slider.parentElement.previousElementSibling.appendChild(container);
+}
 
-    slider.style.display = "none";
-    slider.parentElement.style.display = "none";
+function newPage()
+{
+    if (/^https:\/\/anilist\.co\/user\/[^\/]+\/animelist.*$/.test(window.location.href) ||
+        /^https:\/\/anilist\.co\/user\/[^\/]+\/mangalist.*$/.test(window.location.href))
+    {
+        replaceSlider();
+    }
 }
 
 async function main()
@@ -92,25 +82,10 @@ async function main()
     const originalPushState = history.pushState;
     history.pushState = function(...args) {
         originalPushState.apply(this, args);
-        if (window.location.href.match("https://anilist.co/user/Nounours0261/animelist*"))
-        {
-            replaceSlider();
-        }
+        newPage();
     };
-    window.addEventListener('popstate', () => {
-        if (window.location.href.match("https://anilist.co/user/Nounours0261/animelist*"))
-        {
-            replaceSlider();
-        }
-    });
-    if (window.location.href.match("https://anilist.co/user/Nounours0261/animelist*"))
-    {
-        replaceSlider();
-    }
-    else
-    {
-        console.log("no match");
-    }
+    window.addEventListener('popstate', newPage);
+    newPage();
 }
 
 main();

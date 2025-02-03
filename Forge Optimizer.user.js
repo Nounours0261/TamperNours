@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Forge Optimizer
 // @namespace    Nounours0261
-// @version      1.1
+// @version      1
 // @description  Make Forge navigation easier
 // @author       Nours & ChatGPT
 // @match        https://intra.forge.epita.fr/*
@@ -9,7 +9,6 @@
 // @run-at       document-idle
 // @grant        GM.setValue
 // @grant        GM.getValue
-// @require      https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js
 // ==/UserScript==
 
 function tagStatus(tagres)
@@ -147,6 +146,7 @@ async function handleMidPage()
     }
 
     let skipMidPages = await GM.getValue("skipMidPages");
+        console.log(skipMidPages);
 
     if (!skipMidPages)
     {

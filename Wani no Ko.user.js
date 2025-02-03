@@ -1,32 +1,15 @@
 // ==UserScript==
 // @name         Wani no Ko
 // @namespace    Nounours0261
-// @version      1
+// @version      1.4
 // @description  Change the colors and icons on WaniKani
 // @author       Nours
 // @match        https://www.wanikani.com/*
 // @icon         https://i.imgur.com/vfOcObX.png
 // @run-at       document-start
+// @require      https://github.com/Nounours0261/TamperNours/raw/refs/heads/main/waitForList.js
 // @grant        none
 // ==/UserScript==
-
-function waitForList(selector, times) {
-    let step = times ? 1 : 0;
-    times = times ? times : 10;
-    return new Promise((resolve) => {
-        let interval;
-        const testFunction = () => {
-            const list = document.querySelectorAll(selector);
-            if (list.length != 0 || times <= 0) {
-                clearInterval(interval);
-                resolve(list);
-            }
-            times -= step;
-        };
-        testFunction();
-        interval = setInterval(testFunction, 100);
-    });
-}
 
 const chibis = {
     ai: "https://i.imgur.com/iW4FOVG.png",
@@ -267,6 +250,7 @@ const styleText = `:root {
             flex-basis: 100%;
         }
 
+        #section-context .subject-section__text p:not([lang="ja"]):not(:hover),
         .context-sentence-group p:not([lang="ja"]):not(:hover),
         .subject-collocations__collocation-text:not([lang="ja"]):not(:hover),
         .context-sentences .wk-text:not([lang="ja"]):not(:hover) {
@@ -406,6 +390,14 @@ const styleText = `:root {
 
             .level-up-alert__image img {
             visibility: hidden;
+            }
+
+            .subject-section__subsection:has(#user_meaning_note),
+            .subject-section__subsection:has(#user_reading_note),
+            .subject-slide .subject-section:has(#user_meaning_note),
+            .subject-slide .subject-section:has(#user_reading_note)
+            {
+                display: none;
             }`;
 
 main();
@@ -537,6 +529,7 @@ function generateCSS()
             flex-basis: 100%;
         }
 
+        #section-context .subject-section__text p:not([lang="ja"]):not(:hover),
         .context-sentence-group p:not([lang="ja"]):not(:hover),
         .subject-collocations__collocation-text:not([lang="ja"]):not(:hover),
         .context-sentences .wk-text:not([lang="ja"]):not(:hover) {
@@ -544,6 +537,18 @@ function generateCSS()
             background-color: #eee;
             color: rgba(0, 0, 0, 0);
             text-shadow: none;
+        }
+
+        .level-up-alert__image img {
+            visibility: hidden;
+        }
+
+        .subject-section__subsection:has(#user_meaning_note),
+            .subject-section__subsection:has(#user_reading_note),
+            .subject-section:has(#user_meaning_note),
+            .subject-section:has(#user_reading_note)
+            {
+                display: none;
         }
     `;
 
@@ -591,10 +596,6 @@ function generateCSS()
 
             .character-header--${type} .chibiNours {
                 background-image: url(${chibis[types[type]]});
-            }
-
-            .level-up-alert__image img {
-                visibility: hidden;
             }`;
     }
     console.log(res);
