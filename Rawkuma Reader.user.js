@@ -4,12 +4,20 @@
 // @version      1
 // @description  Remove unnecessary elements from the Rawkuma website
 // @author       Nours
-// @match        https://rawkuma.com/*
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=https://rawkuma.com
+// @match        https://rawkuma.net/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=https://rawkuma.net
 // @run-at       document-idle
-// @require      https://github.com/Nounours0261/TamperNours/raw/refs/heads/main/waitForList.js
 // @grant        none
 // ==/UserScript==
+
+const pastelColors = [
+    "#FFB3B3", // pastel red
+    "#ADD8E6", // pastel blue
+    "#FFFFB3", // pastel yellow
+    "#B3FFB3", // pastel green
+    "#FFD1A4", // pastel orange
+    "#D9B3FF", // pastel purple
+];
 
 function makeImgDiv(sources)
 {
@@ -52,12 +60,12 @@ function handleKeydown(event, pageSize, startScroll)
         }
         else
         {
-            let newPos = Math.round(startScroll);
+            const newPos = Math.round(startScroll);
             const curPos = Math.round(window.pageYOffset);
             while (newPos < curPos + 1)
             {
                 newPos += pageSize;
-            console.log(newPos, curPos);
+                console.log(newPos, curPos);
             }
             window.scroll(0, newPos);
         }
@@ -66,7 +74,7 @@ function handleKeydown(event, pageSize, startScroll)
     {
         event.preventDefault();
         event.stopPropagation();
-        let newPos = Math.round(startScroll);
+        const newPos = Math.round(startScroll);
         const curPos = Math.round(window.pageYOffset);
         while (newPos + pageSize < curPos - 1)
         {
@@ -77,18 +85,20 @@ function handleKeydown(event, pageSize, startScroll)
     }
 }
 
-function makeChapList(options)
+function makeChapList(options, color)
 {
     const listContainer = document.createElement('div');
     listContainer.id = "chapList";
-    listContainer.style.cssText = `min-height: 50px; margin: 10px 0;`;
+    listContainer.style.cssText = `margin: 10px 0;`;
 
     const toggleButton = document.createElement('button');
-    toggleButton.innerText = 'Chapter selection';
-    toggleButton.style.cssText = `border-radius: 5px; width: 100%; height: 50px;  text-align: center; background-color: #68d8d6;
+    const img = document.createElement("img");
+    img.src = "https://cdn-icons-png.flaticon.com/512/151/151867.png";
+    img.style.cssText = `height: 100%; object-fit: cover;`;
+    toggleButton.appendChild(img);
+    toggleButton.style.cssText = `border-radius: 5px; width: 100%; height: 50px;  text-align: center; background-color: ${color};
     border: none; cursor: pointer; font-size: 16px; align-items: center; justify-content: center;`;
     toggleButton.addEventListener('click', () => { listContent.style.display = listContent.style.display === 'flex' ? 'none' : 'flex'; });
-    toggleButton.addEventListener('click', () => { listContent.scrollTop = 50; }, { once: true });
 
     const listContent = document.createElement('div');
     listContent.style.cssText = `display: none; padding: 5px 10px; overflow-y: auto; max-height: 200px; text-align: center;
@@ -107,66 +117,75 @@ function makeChapList(options)
     return listContainer;
 }
 
-function makeSimpleButton(text, color, url)
+function makeImageButton(image, color, url)
 {
-    const button = document.createElement("a");
-    button.style.cssText = `border-radius: 5px; width: auto; height: 50px; padding: 7px 10px; text-align: center; background-color: ${color};
-                            display: flex; cursor: pointer; margin: 10px 0; color: #000000; font-size: 16px; align-items: center; justify-content: center;`;
-    button.textContent = text;
-    button.href = url;
-    return button;
-}
-
-function makeHomeButton()
-{
-    let res = document.createElement("a");
-    res.style.cssText = `height: 50px; padding: 7px 10px; border: none; cursor: pointer; margin: 10px 0; align-items: center; justify-content: center;
-    background-color: #68d8d6; border-radius: 5px; display:flex;`;
-    let img = document.createElement("img");
-    img.src = "https://rawkuma.com/wp-content/uploads/2024/02/Rawkuma-Hero-Icon-top-light-mode-2.png";
+    const res = document.createElement("a");
+    res.style.cssText = `height: 50px; padding: 7px 10px; border: none; cursor: pointer; margin: 10px 0px; align-items: center; justify-content: center;
+    background-color: ${color}; border-radius: 5px; display:flex;`;
+    const img = document.createElement("img");
+    img.src = image;
     img.style.cssText = `height: 100%; object-fit: cover;`;
     res.appendChild(img);
-    res.href = "https://rawkuma.com/";
+    res.href = url;
     return res;
 }
 
-function makeButtonDiv(id, mangaHome, chapOptions, next, prev)
+function makeButtonDiv(mangaHome, chapOptions, next, prev, color)
 {
-    let res = document.createElement("div");
-    res.style.cssText = `display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 0px 10px`;
-    res.id = id;
-    res.append(makeHomeButton());
-    res.appendChild(makeSimpleButton("Manga homepage", "#68d8d6", mangaHome.href));
-    res.appendChild(makeChapList(chapOptions));
-    res.appendChild(makeSimpleButton("Prev", "#68d8d6", prev.href));
-    res.appendChild(makeSimpleButton("Next", "#68d8d6", next.href));
+    const res = document.createElement("div");
+    res.style.cssText = `display: none; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 0px 10px;
+    width: 100%; background-color: #000; position: fixed; top: 0px;`;
+    res.append(makeImageButton("https://cdn-icons-png.flaticon.com/256/25/25694.png", color, "https://rawkuma.net/"));
+    res.appendChild(makeImageButton("https://cdn-icons-png.flaticon.com/512/4/4259.png", color, mangaHome.href));
+    res.appendChild(makeChapList(chapOptions, color));
+    res.appendChild(makeImageButton("https://i.imgur.com/GsmN65J.png", color, prev.href));
+    res.appendChild(makeImageButton("https://i.imgur.com/JiJBlRZ.png", color, next.href));
+    res.id = "topDiv";
+
     return res;
+}
+
+function makeTitleDiv(title, color)
+{
+    const div = document.createElement('div');
+    div.textContent = title;
+    div.style.cssText = `position: fixed; bottom: 0px; width: 100%; background-color: #000; padding: 5px; text-align: center;
+    display: none; font-size: 1.2rem; color: ${color};`;
+    return div;
 }
 
 async function main()
 {
+    // Grabbing info
     let chapOptions = document.querySelector("#chapter").querySelectorAll("option[data-id]");
-    let sources = Array.from(await waitForList("img.ts-main-image")).map((img) => { return img.src; });
-    let mangaHome = (await waitForList(".allc a"))[0];
-    let next = (await waitForList(".ch-next-btn"))[0];
-    let prev = (await waitForList(".ch-prev-btn"))[0];
+    let sources = Array.from(document.querySelectorAll("img.ts-main-image")).map((img) => { return img.src; });
+    let mangaHome = document.querySelector(".allc a");
+    let next = document.querySelector(".ch-next-btn");
+    let prev = document.querySelector(".ch-prev-btn");
+    let title = document.querySelector(".entry-title").textContent;
+    const color = pastelColors[Math.floor(Math.random() * pastelColors.length)];
 
+    //Deleting everything
     document.body.innerHTML = "";
-
-    let topDiv = makeButtonDiv("topDiv", mangaHome, chapOptions, next, prev);
-    document.body.appendChild(topDiv);
-    let imgDiv = makeImgDiv(sources);
-    document.body.appendChild(imgDiv);
-    document.body.appendChild(makeButtonDiv("bottomDiv", mangaHome, chapOptions, next, prev));
-
     jQuery(window).off("keydown");
     jQuery(window).off("click");
+
+    const topDiv = makeButtonDiv(mangaHome, chapOptions, next, prev, color);
+    document.body.appendChild(topDiv);
+    const imgDiv = makeImgDiv(sources);
+    document.body.appendChild(imgDiv);
+    const titleDiv = makeTitleDiv(title, color);
+    document.body.appendChild(titleDiv);
+
     addStyle();
     window.addEventListener('keydown', (event) => handleKeydown(event, window.innerHeight, 70));
-    if (window.scrollY == 0)
-    {
-        setTimeout(() => {window.scrollBy({ top: 70, left: 0 })}, 400);
-    }
+    window.addEventListener('click', (e) => {
+        if (!topDiv.contains(e.target))
+        {
+            topDiv.style.display = topDiv.style.display == "grid" ? "none" : "grid";
+            titleDiv.style.display = titleDiv.style.display == "block" ? "none" : "block";
+        }
+    });
 }
 
 main();
