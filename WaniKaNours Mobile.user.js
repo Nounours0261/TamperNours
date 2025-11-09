@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         WaniKaNours
+// @name         WaniKaNours Mobile
 // @namespace    Nounours0261
-// @version      1.0
+// @version      1.1
 // @description  Useful features on WaniKani
 // @author       ChatGPT & Nours
 // @match        https://www.wanikani.com/*
@@ -25,20 +25,7 @@ document.addEventListener('touchend', (e) =>
 
     if (tapLength < doubleTapDelay && tapLength > 0)
     {
-        let logDiv = document.getElementById('double-tap-log');
-        if (!logDiv)
-        {
-            logDiv = document.createElement('div');
-            logDiv.id = 'double-tap-log';
-            logDiv.style.position = 'fixed';
-            logDiv.style.top = '0';
-            logDiv.style.left = '0';
-            logDiv.style.width = '100%';
-            logDiv.style.background = 'rgba(255,255,255,0.8)';
-            logDiv.style.zIndex = '9999';
-            document.body.appendChild(logDiv);
-        }
-        logDiv.textContent = `Double-tap detected! Time between taps: ${tapLength}ms`;
+        document.querySelector(".quiz-input__submit-button").click();
     }
 
     lastTap = currentTime;
@@ -132,25 +119,6 @@ function runScript() {
     kataReviews(url.includes("review"));
     kataLessons(url.includes("subject-lessons") && !url.includes("quiz") && !url.includes("picker"));
     kataReviews(url.includes("subject-lessons") && url.includes("quiz"));
-}
-
-async function rotateInfo(info) {
-    const c = info.children[0];
-    if (c.children[0].hasAttribute("expanded")) {
-        const f = (await waitForList(".character-header"))[0];
-
-        if (f.classList.contains("character-header--kanji")) {
-            if (c.children[0].classList.contains("subject-section--components")) {
-                c.insertBefore(c.children[2], c.children[0]);
-            } else {
-                c.insertBefore(c.children[0], c.children[3]);
-            }
-        }
-
-        if (f.classList.contains("character-header--vocabulary")) {
-            c.insertBefore(c.children[1], c.children[0]);
-        }
-    }
 }
 
 async function handleEnter() {
