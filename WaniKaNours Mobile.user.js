@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WaniKaNours Mobile
 // @namespace    Nounours0261
-// @version      1.1
+// @version      1.2
 // @description  Useful features on WaniKani
 // @author       ChatGPT & Nours
 // @match        https://www.wanikani.com/*
