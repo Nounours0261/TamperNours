@@ -15,16 +15,14 @@
 let lastTap = 0;
 const doubleTapDelay = 300;
 
-document.addEventListener('touchend', (e) =>
-{
+document.addEventListener('touchend', (e) => {
     const touch = e.changedTouches[0];
     if (touch.clientX < window.innerWidth / 2) return;
 
     const currentTime = Date.now();
     const tapLength = currentTime - lastTap;
 
-    if (tapLength < doubleTapDelay && tapLength > 0)
-    {
+    if (tapLength < doubleTapDelay && tapLength > 0) {
         document.querySelector(".quiz-input__submit-button").click();
     }
 
@@ -123,15 +121,18 @@ function runScript() {
 
 async function handleEnter() {
     document.dispatchEvent(new KeyboardEvent("keydown", {key: "f", bubbles: true,}));
-    const inputEl = document.querySelector("#user-response");
-    inputEl.disabled = true;
 
+    const inputWrapper = document.querySelector(".quiz-input__input-container");
+    if (inputWrapper.getAttribute("correct") === false) {
+        const inputEl = inputWrapper.querySelector("#user-response");
+        inputEl.disabled = true;
+        inputEl.disabled = false;
+    }
     const container = document.querySelector(".quiz");
     container.onscroll = () => {
         container.scrollTo(0, 0);
         setTimeout(() => {
             container.onscroll = null;
-            inputEl.disabled = false;
         }, 50);
     };
 
