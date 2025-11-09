@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WaniKaNours Mobile
 // @namespace    Nounours0261
-// @version      1.2
+// @version      1.3
 // @description  Useful features on WaniKani
 // @author       ChatGPT & Nours
 // @match        https://www.wanikani.com/*
@@ -126,7 +126,9 @@ async function handleEnter() {
     if (inputWrapper.getAttribute("correct") === false) {
         const inputEl = inputWrapper.querySelector("#user-response");
         inputEl.disabled = true;
-        inputEl.disabled = false;
+        setTimeout(() => {
+            inputEl.disabled = false;
+        }, 100);
     }
     const container = document.querySelector(".quiz");
     container.onscroll = () => {
