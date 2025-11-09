@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WaniKaNours
 // @namespace    Nounours0261
-// @version      1.5
+// @version      1.0
 // @description  Useful features on WaniKani
 // @author       ChatGPT & Nours
 // @match        https://www.wanikani.com/*
@@ -10,6 +10,40 @@
 // @require      https://github.com/Nounours0261/TamperNours/raw/refs/heads/main/waitForList.js
 // @grant        none
 // ==/UserScript==
+
+
+let lastTap = 0;
+const doubleTapDelay = 300;
+
+document.addEventListener('touchend', (e) =>
+{
+    const touch = e.changedTouches[0];
+    if (touch.clientX < window.innerWidth / 2) return;
+
+    const currentTime = Date.now();
+    const tapLength = currentTime - lastTap;
+
+    if (tapLength < doubleTapDelay && tapLength > 0)
+    {
+        let logDiv = document.getElementById('double-tap-log');
+        if (!logDiv)
+        {
+            logDiv = document.createElement('div');
+            logDiv.id = 'double-tap-log';
+            logDiv.style.position = 'fixed';
+            logDiv.style.top = '0';
+            logDiv.style.left = '0';
+            logDiv.style.width = '100%';
+            logDiv.style.background = 'rgba(255,255,255,0.8)';
+            logDiv.style.zIndex = '9999';
+            document.body.appendChild(logDiv);
+        }
+        logDiv.textContent = `Double-tap detected! Time between taps: ${tapLength}ms`;
+    }
+
+    lastTap = currentTime;
+});
+
 
 function hitoka(hiragana) {
     const offset = 0x60;
@@ -119,28 +153,24 @@ async function rotateInfo(info) {
     }
 }
 
-async function handleDollar() {
-    const info = (await waitForList(`.subject-info[data-loaded=true]`))[0];
-    rotateInfo(info);
-    if (!Array.from(await waitForList(`.subject-section`)).every((e) => {
-        return e.hasAttribute("expanded")
-    })) {
-        document.dispatchEvent(new KeyboardEvent("keydown", {key: "e", bubbles: true,}));
-    }
-}
-
 async function handleEnter() {
     document.dispatchEvent(new KeyboardEvent("keydown", {key: "f", bubbles: true,}));
+    const inputEl = document.querySelector("#user-response");
+    inputEl.disabled = true;
+
+    const container = document.querySelector(".quiz");
+    container.onscroll = () => {
+        container.scrollTo(0, 0);
+        setTimeout(() => {
+            container.onscroll = null;
+            inputEl.disabled = false;
+        }, 50);
+    };
+
     wrapKanjiWithLinks("character-header__characters");
 }
 
 function handleKeys(e) {
-    if (e.key === "$") {
-        const response = document.querySelector("#user-response");
-        if (response && response.getAttribute("enabled") === "false") {
-            handleDollar();
-        }
-    }
     if (e.key === "Enter") {
         const response = document.querySelector(".additional-content__item--item-info");
         if (response && !response.classList.contains("additional-content__item--open")) {
