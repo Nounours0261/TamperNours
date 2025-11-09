@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WaniKaNours Mobile
 // @namespace    Nounours0261
-// @version      1.3
+// @version      1.4
 // @description  Useful features on WaniKani
 // @author       ChatGPT & Nours
 // @match        https://www.wanikani.com/*
@@ -10,25 +10,6 @@
 // @require      https://github.com/Nounours0261/TamperNours/raw/refs/heads/main/waitForList.js
 // @grant        none
 // ==/UserScript==
-
-
-let lastTap = 0;
-const doubleTapDelay = 300;
-
-document.addEventListener('touchend', (e) => {
-    const touch = e.changedTouches[0];
-    if (touch.clientX < window.innerWidth / 2) return;
-
-    const currentTime = Date.now();
-    const tapLength = currentTime - lastTap;
-
-    if (tapLength < doubleTapDelay && tapLength > 0) {
-        document.querySelector(".quiz-input__submit-button").click();
-    }
-
-    lastTap = currentTime;
-});
-
 
 function hitoka(hiragana) {
     const offset = 0x60;
@@ -123,7 +104,7 @@ async function handleEnter() {
     document.dispatchEvent(new KeyboardEvent("keydown", {key: "f", bubbles: true,}));
 
     const inputWrapper = document.querySelector(".quiz-input__input-container");
-    if (inputWrapper.getAttribute("correct") === false) {
+    if (inputWrapper.getAttribute("correct") === "false") {
         const inputEl = inputWrapper.querySelector("#user-response");
         inputEl.disabled = true;
         setTimeout(() => {
